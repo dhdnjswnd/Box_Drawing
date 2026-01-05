@@ -1,0 +1,297 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background-color: #2d2d2d;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #404040;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.btn-success {
+    background-color: #2196F3;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #0b7dda;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #da190b;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Main Content */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Canvas Container */
+.canvas-container {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 15px;
+    align-content: start;
+}
+
+.canvas-wrapper {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+    border: 2px solid #404040;
+}
+
+.canvas-wrapper.active {
+    border-color: #4CAF50;
+}
+
+.canvas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.canvas-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #aaaaaa;
+}
+
+.canvas-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.canvas-viewport {
+    width: 100%;
+    height: 400px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #1a1a1a;
+}
+
+.canvas-viewport canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Side Panel */
+.side-panel {
+    width: 320px;
+    background-color: #2d2d2d;
+    border-left: 2px solid #404040;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.side-panel h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #4CAF50;
+}
+
+.side-panel h3 {
+    font-size: 16px;
+    margin: 20px 0 10px 0;
+    color: #aaaaaa;
+}
+
+/* Properties Panel */
+.properties-panel {
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.no-selection {
+    color: #888888;
+    font-style: italic;
+    text-align: center;
+}
+
+.property-group {
+    margin-bottom: 15px;
+}
+
+.property-label {
+    display: block;
+    font-size: 12px;
+    color: #aaaaaa;
+    margin-bottom: 5px;
+}
+
+.property-input {
+    width: 100%;
+    padding: 8px;
+    background-color: #2d2d2d;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.property-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.property-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.delete-box-btn {
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Filter Section */
+.filter-section {
+    margin-top: 20px;
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-controls label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.filter-controls label:hover {
+    background-color: #2d2d2d;
+}
+
+.filter-controls input[type="radio"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* Legend */
+.legend {
+    margin-top: 20px;
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.legend-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 30px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #404040;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}

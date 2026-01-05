@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Box Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>3D Box Visualizer</h1>
+            <div class="header-controls">
+                <button id="addCanvasBtn" class="btn btn-primary">+ New Canvas</button>
+                <button id="addBoxBtn" class="btn btn-success">+ Add Box</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Canvas Container -->
+            <div id="canvasContainer" class="canvas-container">
+                <!-- Canvas items will be dynamically added here -->
+            </div>
+
+            <!-- Side Panel -->
+            <aside class="side-panel">
+                <h2>Box Properties</h2>
+                <div id="propertiesPanel" class="properties-panel">
+                    <p class="no-selection">Select a box to view properties</p>
+                </div>
+
+                <!-- Color Filter Section -->
+                <div class="filter-section">
+                    <h3>Color Filters</h3>
+                    <div id="filterControls" class="filter-controls">
+                        <label>
+                            <input type="radio" name="colorFilter" value="volume" checked>
+                            Volume
+                        </label>
+                        <label>
+                            <input type="radio" name="colorFilter" value="height">
+                            Height
+                        </label>
+                        <label>
+                            <input type="radio" name="colorFilter" value="area">
+                            Surface Area
+                        </label>
+                        <label>
+                            <input type="radio" name="colorFilter" value="position">
+                            Position
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="legend">
+                    <h3>Color Legend</h3>
+                    <div id="legendContent" class="legend-content">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #ff0000;"></span>
+                            <span>High</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #ffff00;"></span>
+                            <span>Medium</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #00ff00;"></span>
+                            <span>Low</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
