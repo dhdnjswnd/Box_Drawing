@@ -1,6 +1,14 @@
 # 3D Box Visualizer
 
-3D 렌더링 라이브러리(Three.js)를 활용한 박스 그리기 및 시각화 웹 애플리케이션입니다.
+React + TypeScript + Three.js를 활용한 현대적인 3D 박스 그리기 및 시각화 웹 애플리케이션입니다.
+
+## 🚀 기술 스택
+
+- **React 18**: 컴포넌트 기반 UI 프레임워크
+- **TypeScript**: 타입 안정성과 개발 경험 향상
+- **Three.js**: 3D 렌더링 라이브러리
+- **Vite**: 빠른 빌드 도구
+- **Context API**: 전역 상태 관리
 
 ## 주요 기능
 
@@ -90,10 +98,77 @@ npm run build
 - **Import Data**: 상단의 "Import Data" 버튼을 클릭하여 이전에 저장한 JSON 파일을 불러옵니다.
 - 저장된 파일에는 모든 캔버스, 박스 정보, 색상 필터 설정이 포함됩니다.
 
-## 기술 스택
-- **Three.js**: 3D 렌더링
-- **Vite**: 빌드 도구
-- **Vanilla JavaScript**: 프론트엔드 로직
+## 📁 프로젝트 구조
 
-## 라이선스
+```
+src/
+├── components/          # React 컴포넌트
+│   ├── Header.tsx      # 헤더 및 메인 액션 버튼
+│   ├── CanvasTabs.tsx  # 캔버스 탭 시스템
+│   ├── Canvas3DView.tsx # Three.js 3D 뷰
+│   ├── MainContent.tsx  # 메인 컨텐츠 레이아웃
+│   ├── SidePanel.tsx    # 사이드 패널
+│   ├── PropertiesPanel.tsx # 박스 속성 편집
+│   └── ColorFilters.tsx    # 색상 필터
+├── context/            # Context API
+│   └── AppContext.tsx  # 전역 상태 관리
+├── types/              # TypeScript 타입 정의
+│   └── index.ts
+├── App.tsx             # 메인 앱 컴포넌트
+├── App.css             # 스타일
+└── main.tsx            # 엔트리 포인트
+```
+
+## 🎨 주요 기능
+
+### Type-Safe Development
+- TypeScript로 작성되어 타입 안정성 보장
+- 컴파일 타임 에러 감지
+- 우수한 IDE 지원 및 자동 완성
+
+### React Architecture
+- 컴포넌트 기반 모듈화
+- Context API를 통한 효율적인 상태 관리
+- React Hooks를 활용한 사이드 이펙트 관리
+
+### Performance
+- Vite의 빠른 HMR (Hot Module Replacement)
+- 최적화된 빌드
+- Three.js를 활용한 효율적인 3D 렌더링
+
+## 📝 개발 가이드
+
+### 컴포넌트 추가
+새로운 컴포넌트는 `src/components/` 디렉토리에 추가하세요.
+
+### 타입 정의
+타입은 `src/types/index.ts`에 정의되어 있으며, 필요시 확장할 수 있습니다.
+
+### 상태 관리
+전역 상태는 `src/context/AppContext.tsx`에서 관리됩니다.
+
+## 🔧 트러블슈팅
+
+### Three.js 타입 에러
+Three.js 타입이 없다는 에러가 발생하면:
+```bash
+npm install --save-dev @types/three
+```
+
+### Vite 빌드 에러
+캐시를 삭제하고 다시 빌드:
+```bash
+rm -rf node_modules/.vite
+npm run dev
+```
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 라이선스
 MIT
