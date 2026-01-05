@@ -14,8 +14,16 @@
             <div class="header-controls">
                 <button id="addCanvasBtn" class="btn btn-primary">+ New Canvas</button>
                 <button id="addBoxBtn" class="btn btn-success">+ Add Box</button>
+                <button id="exportDataBtn" class="btn btn-secondary">Export Data</button>
+                <button id="importDataBtn" class="btn btn-secondary">Import Data</button>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;">
             </div>
         </header>
+
+        <!-- Canvas Tabs -->
+        <div class="canvas-tabs" id="canvasTabs">
+            <!-- Tabs will be dynamically added here -->
+        </div>
 
         <!-- Main Content -->
         <div class="main-content">

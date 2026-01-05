@@ -9,7 +9,8 @@ const state = {
     colorFilter: 'volume',
     snapDistance: 0.5,
     isDragging: false,
-    boxIdCounter: 0
+    boxIdCounter: 0,
+    canvasIdCounter: 0
 };
 
 // Box class to manage individual boxes
@@ -86,12 +87,42 @@ class Box {
             this.edges.material.color.setHex(0x000000);
         }
     }
+
+    toJSON() {
+        return {
+            id: this.id,
+            width: this.width,
+            height: this.height,
+            depth: this.depth,
+            x: this.x,
+            y: this.y,
+            z: this.z,
+            metadata: this.metadata
+        };
+    }
+
+    static fromJSON(data) {
+        const box = new Box(
+            data.id,
+            data.width,
+            data.height,
+            data.depth,
+            data.x,
+            data.y,
+            data.z
+        );
+        if (data.metadata) {
+            box.metadata = { ...data.metadata };
+        }
+        return box;
+    }
 }
 
 // Canvas3D class to manage individual 3D scenes
 class Canvas3D {
-    constructor(id, containerElement) {
+    constructor(id, containerElement, name = null) {
         this.id = id;
+        this.name = name || `Canvas ${state.canvasIdCounter}`;
         this.boxes = [];
         this.containerElement = containerElement;
 
@@ -348,11 +379,31 @@ class Canvas3D {
         this.controls.dispose();
         this.containerElement.removeChild(this.renderer.domElement);
     }
+
+    toJSON() {
+        return {
+            id: this.id,
+            name: this.name,
+            boxes: this.boxes.map(box => box.toJSON())
+        };
+    }
+
+    static fromJSON(data, containerElement) {
+        const canvas = new Canvas3D(data.id, containerElement, data.name);
+        if (data.boxes) {
+            data.boxes.forEach(boxData => {
+                const box = Box.fromJSON(boxData);
+                canvas.addBox(box);
+            });
+        }
+        return canvas;
+    }
 }
 
 // UI Management Functions
-function createCanvasWrapper() {
-    const canvasId = `canvas-${state.canvases.length}`;
+function createCanvasWrapper(name = null) {
+    const canvasId = `canvas-${state.canvasIdCounter}`;
+    state.canvasIdCounter++;
 
     // Create wrapper element
     const wrapper = document.createElement('div');
@@ -365,7 +416,7 @@ function createCanvasWrapper() {
 
     const title = document.createElement('div');
     title.className = 'canvas-title';
-    title.textContent = `Canvas ${state.canvases.length + 1}`;
+    title.textContent = name || `Canvas ${state.canvasIdCounter}`;
 
     const controls = document.createElement('div');
     controls.className = 'canvas-controls';
@@ -391,8 +442,11 @@ function createCanvasWrapper() {
     document.getElementById('canvasContainer').appendChild(wrapper);
 
     // Create Canvas3D instance
-    const canvas3D = new Canvas3D(canvasId, viewport);
+    const canvas3D = new Canvas3D(canvasId, viewport, name);
     state.canvases.push(canvas3D);
+
+    // Create tab
+    createCanvasTab(canvas3D);
 
     // Set as active
     setActiveCanvas(canvas3D);
@@ -408,9 +462,15 @@ function removeCanvas(canvasId) {
         state.canvases.splice(index, 1);
 
         // Remove DOM element
-        const wrapper = document.querySelector(`[data-canvas-id="${canvasId}"]`);
+        const wrapper = document.querySelector(`.canvas-wrapper[data-canvas-id="${canvasId}"]`);
         if (wrapper) {
             wrapper.remove();
+        }
+
+        // Remove tab
+        const tab = document.querySelector(`.canvas-tab[data-canvas-id="${canvasId}"]`);
+        if (tab) {
+            tab.remove();
         }
 
         // Set new active canvas
@@ -418,6 +478,8 @@ function removeCanvas(canvasId) {
             state.activeCanvas = state.canvases[0] || null;
             if (state.activeCanvas) {
                 setActiveCanvas(state.activeCanvas);
+            } else {
+                deselectBox();
             }
         }
     }
@@ -426,9 +488,14 @@ function removeCanvas(canvasId) {
 function setActiveCanvas(canvas) {
     state.activeCanvas = canvas;
 
-    // Update UI
+    // Update wrapper UI
     document.querySelectorAll('.canvas-wrapper').forEach(wrapper => {
         wrapper.classList.remove('active');
+    });
+
+    // Update tab UI
+    document.querySelectorAll('.canvas-tab').forEach(tab => {
+        tab.classList.remove('active');
     });
 
     if (canvas) {
@@ -436,7 +503,15 @@ function setActiveCanvas(canvas) {
         if (wrapper) {
             wrapper.classList.add('active');
         }
+
+        const tab = document.querySelector(`.canvas-tab[data-canvas-id="${canvas.id}"]`);
+        if (tab) {
+            tab.classList.add('active');
+        }
     }
+
+    // Deselect box when switching canvas
+    deselectBox();
 }
 
 function addBox() {
@@ -603,9 +678,216 @@ function updateColorFilter() {
     });
 }
 
+// Tab Management Functions
+function createCanvasTab(canvas) {
+    const tabsContainer = document.getElementById('canvasTabs');
+
+    const tab = document.createElement('div');
+    tab.className = 'canvas-tab';
+    tab.dataset.canvasId = canvas.id;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'canvas-tab-name';
+    nameSpan.textContent = canvas.name;
+    nameSpan.ondblclick = () => enableTabNameEdit(canvas.id);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'canvas-tab-close';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeCanvas(canvas.id);
+    };
+
+    tab.appendChild(nameSpan);
+    tab.appendChild(closeBtn);
+
+    tab.onclick = () => {
+        const canvas = state.canvases.find(c => c.id === tab.dataset.canvasId);
+        if (canvas) {
+            setActiveCanvas(canvas);
+        }
+    };
+
+    tabsContainer.appendChild(tab);
+}
+
+function enableTabNameEdit(canvasId) {
+    const canvas = state.canvases.find(c => c.id === canvasId);
+    if (!canvas) return;
+
+    const tab = document.querySelector(`.canvas-tab[data-canvas-id="${canvasId}"]`);
+    const nameSpan = tab.querySelector('.canvas-tab-name');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'canvas-tab-name-input';
+    input.value = canvas.name;
+
+    input.onblur = () => {
+        const newName = input.value.trim() || canvas.name;
+        canvas.name = newName;
+        nameSpan.textContent = newName;
+
+        // Update canvas header title
+        const wrapper = document.querySelector(`.canvas-wrapper[data-canvas-id="${canvasId}"]`);
+        if (wrapper) {
+            const title = wrapper.querySelector('.canvas-title');
+            if (title) {
+                title.textContent = newName;
+            }
+        }
+
+        nameSpan.style.display = 'block';
+        input.remove();
+    };
+
+    input.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            input.blur();
+        } else if (e.key === 'Escape') {
+            nameSpan.style.display = 'block';
+            input.remove();
+        }
+    };
+
+    nameSpan.style.display = 'none';
+    tab.insertBefore(input, nameSpan);
+    input.focus();
+    input.select();
+}
+
+// Import/Export Functions
+function exportData() {
+    const data = {
+        version: '1.0',
+        canvases: state.canvases.map(canvas => canvas.toJSON()),
+        colorFilter: state.colorFilter,
+        boxIdCounter: state.boxIdCounter,
+        canvasIdCounter: state.canvasIdCounter
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `box-visualizer-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importData(file) {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            // Clear existing canvases
+            while (state.canvases.length > 0) {
+                removeCanvas(state.canvases[0].id);
+            }
+
+            // Restore state
+            state.colorFilter = data.colorFilter || 'volume';
+            state.boxIdCounter = data.boxIdCounter || 0;
+            state.canvasIdCounter = data.canvasIdCounter || 0;
+
+            // Update color filter radio
+            const filterRadio = document.querySelector(`input[name="colorFilter"][value="${state.colorFilter}"]`);
+            if (filterRadio) {
+                filterRadio.checked = true;
+            }
+
+            // Recreate canvases
+            if (data.canvases && data.canvases.length > 0) {
+                data.canvases.forEach(canvasData => {
+                    const canvasId = canvasData.id;
+
+                    // Create wrapper
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'canvas-wrapper';
+                    wrapper.dataset.canvasId = canvasId;
+
+                    const header = document.createElement('div');
+                    header.className = 'canvas-header';
+
+                    const title = document.createElement('div');
+                    title.className = 'canvas-title';
+                    title.textContent = canvasData.name;
+
+                    const controls = document.createElement('div');
+                    controls.className = 'canvas-controls';
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'btn btn-danger btn-small';
+                    closeBtn.textContent = 'Close';
+                    closeBtn.onclick = () => removeCanvas(canvasId);
+
+                    controls.appendChild(closeBtn);
+                    header.appendChild(title);
+                    header.appendChild(controls);
+
+                    const viewport = document.createElement('div');
+                    viewport.className = 'canvas-viewport';
+                    viewport.dataset.canvasId = canvasId;
+
+                    wrapper.appendChild(header);
+                    wrapper.appendChild(viewport);
+
+                    document.getElementById('canvasContainer').appendChild(wrapper);
+
+                    // Create Canvas3D from JSON
+                    const canvas = Canvas3D.fromJSON(canvasData, viewport);
+                    state.canvases.push(canvas);
+
+                    // Create tab
+                    createCanvasTab(canvas);
+
+                    // Update box ID counter
+                    canvas.boxes.forEach(box => {
+                        if (box.id >= state.boxIdCounter) {
+                            state.boxIdCounter = box.id + 1;
+                        }
+                    });
+                });
+
+                // Set first canvas as active
+                setActiveCanvas(state.canvases[0]);
+            } else {
+                // Create default canvas if none exist
+                createCanvasWrapper();
+            }
+
+            alert('Data imported successfully!');
+        } catch (error) {
+            console.error('Error importing data:', error);
+            alert('Error importing data: ' + error.message);
+        }
+    };
+
+    reader.readAsText(file);
+}
+
 // Event Listeners
 document.getElementById('addCanvasBtn').addEventListener('click', createCanvasWrapper);
 document.getElementById('addBoxBtn').addEventListener('click', addBox);
+document.getElementById('exportDataBtn').addEventListener('click', exportData);
+document.getElementById('importDataBtn').addEventListener('click', () => {
+    document.getElementById('importFileInput').click();
+});
+document.getElementById('importFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        importData(file);
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+});
 
 // Color filter listeners
 document.querySelectorAll('input[name="colorFilter"]').forEach(radio => {
